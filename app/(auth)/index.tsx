@@ -69,6 +69,16 @@ const Signup = () => {
 
             </View>
 
+
+            <View className="flex-row items-center gap-3 my-1">
+              <View className="flex-1 h-px bg-border" />
+              <Text className="text-foreground-subtle text-xs font-medium tracking-widest uppercase">
+                Continue with
+              </Text>
+              <View className="flex-1 h-px bg-border" />
+            </View>
+
+
             <View className='mt-6 flex-row gap-10 pb-3'>
               <Pressable
                 onPress={() => !isLoading && handleSocialAuth("oauth_google")}

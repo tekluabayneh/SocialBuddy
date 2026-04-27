@@ -1,10 +1,11 @@
 import { View, Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function TabTwoScreen() {
   return (
-    <View>
-      <Text>this is the home page</Text>
-    </View>
+    <SafeAreaView>
+      <Text>this is the explore page</Text>
+    </SafeAreaView>
   );
 }
 

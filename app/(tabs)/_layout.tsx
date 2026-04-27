@@ -1,30 +1,25 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Ionicons } from '@expo/vector-icons';
-
+import { Redirect, } from 'expo-router';
+import { useAuth } from '@clerk/expo';
+import { NativeTabs, Label, Icon } from 'expo-router/unstable-native-tabs';
 export default function TabLayout() {
+  const { isSignedIn } = useAuth()
 
+  if (!isSignedIn) {
+    return <Redirect href={"/(auth)"} />
+  }
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-      }}>
+    <NativeTabs>
+      <NativeTabs.Trigger name="index">
+        <Icon
+          ios={{ type: 'sfSymbol', name: 'house.fill' }}
+          android={{ type: 'imageSource', imageSource: 'home' }}
+        />
+        <Label>Home</Label>
+      </NativeTabs.Trigger>
 
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <Ionicons size={28} name="home" color={color} />,
-        }}
+      <NativeTabs.Trigger name="explore">
+      </NativeTabs.Trigger>
 
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <Ionicons size={28} name="person" color={color} />,
-        }}
-      />
-    </Tabs>
+    </NativeTabs>
   );
 }
