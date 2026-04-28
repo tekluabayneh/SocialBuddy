@@ -31,7 +31,7 @@ const Signup = () => {
             <View className='pt-5 items-center justify-center'>
               <Image
                 style={{ width: 320, height: 350 }}
-                source={require("../../assets/images/auth.png")} />
+                source={require("../../../assets/images/auth.png")} />
             </View>
 
 
@@ -85,7 +85,7 @@ const Signup = () => {
                 className="size-20 rounded-2xl bg-white border border-border-light items-center justify-center active:scale-95"
               >
                 <Image
-                  source={require("../../assets/images/google.png")}
+                  source={require("../../../assets/images/google.png")}
                   style={{ width: 28, height: 28 }}
                   contentFit="contain"
                 />
