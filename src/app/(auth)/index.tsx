@@ -18,7 +18,9 @@ const Signup = () => {
           end={{ x: 0.5, y: 1 }}
         />
       </View>
-      <SafeAreaView className='flex-1 justify-between'>
+      <SafeAreaView className='flex-1 justify-between'
+
+      >
         <View>
           <View className='items-center pb-1'>
             <View className="w-16 h-16 rounded-[20px] bg-primary/15 items-center justify-center border border-primary/20">

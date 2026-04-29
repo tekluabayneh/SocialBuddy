@@ -19,8 +19,13 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView className='flex-1 bg-background'>
-      <ScrollView>
-        <Text className='text-3xl pl-2  text-red-50 font-extrabold'>Profile</Text>
+      <ScrollView
+        contentContainerStyle={{
+          paddingBottom: 100, // This pushes the 'Logout' button up so it's clickable
+          paddingHorizontal: 20
+        }}
+      >
+        {/* <Text className='text-3xl pl-2  text-red-50 font-extrabold'>Profile</Text> */}
 
         <View className='items-center py-3'>
           <View className='mb-3.5 relative'>
