@@ -1,3 +1,4 @@
+
 import { StreamChat } from "stream-chat";
 
 const API_KEY = process.env.EXPO_PUBLIC_STREAM_API_KEY as string
