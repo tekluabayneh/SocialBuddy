@@ -7,6 +7,8 @@ import { tokenCache } from '@clerk/expo/token-cache'
 import "../../global.css"
 import { useColorScheme } from '../hooks/use-color-scheme.web';
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { AppProvder } from './context/AppProvider';
+import { ChatWrapper } from '../component/ChatWrapper';
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!
 
@@ -28,10 +30,14 @@ export default function RootLayout() {
     <GestureHandlerRootView className='flex-1'>
       <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache} >
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="(tabs)" />
-          </Stack>
+          <ChatWrapper>
+            <AppProvder>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(auth)" />
+                <Stack.Screen name="(tabs)" />
+              </Stack>
+            </AppProvder>
+          </ChatWrapper>
           <StatusBar style="auto" />
         </ThemeProvider>
       </ClerkProvider >
