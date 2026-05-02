@@ -8,6 +8,7 @@ const STREAM_SECRET_KEY = process.env.STREAM_SECRET_KEY as string
 export default async function POST(req: Request, res: Response) {
   const client = StreamChat.getInstance(API_KEY, STREAM_SECRET_KEY)
 
+  // @ts-expect-error user info does exist in body
   const { userId, name, image } = req?.body
   if (!userId) {
     Response.json({ error: "user id missing" }, { status: 400 })
