@@ -1,100 +1,84 @@
-import React, { useEffect, useRef } from "react"
-import { useUser } from '@clerk/expo';
-import { FullScreenLoader } from "./FullScreenLoader";
-import { Chat, OverlayProvider, useCreateChatClient } from "stream-chat-expo";
 import { studyBuddyTheme } from "../lib/theme";
+import { useUser } from "@clerk/expo";
+import { useEffect, useRef } from "react";
+import { Chat, OverlayProvider, useCreateChatClient } from "stream-chat-expo";
+import { FullScreenLoader } from "./FullScreenLoader";
 type UserResource = NonNullable<ReturnType<typeof useUser>["user"]>;
-const STREAM_SECRET_KEY = process.env.STREAM_SECRET_KEY as string
+const STREAM_API_KEY = process.env.EXPO_PUBLIC_STREAM_API_KEY!;
 
-
-const SynchUserStream = async (user: UserResource) => {
+const syncUserToStream = async (user: UserResource) => {
   try {
-    const res = await fetch("http://localhost:8081/sync-user ", {
+    await fetch("/api/sync-user", {
       method: "POST",
-      headers: {
-        "Content-type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name: user?.username || user?.fullName,
-        image: user?.imageUrl,
-        id: user?.id,
-      })
-    })
-    const data = res.json()
-    console.log(data)
-    return data
+        userId: user.id,
+        name: user.fullName ?? user.username ?? user.emailAddresses[0].emailAddress.split("@")[0],
+        image: user.imageUrl,
+      }),
+    });
   } catch (error) {
-    console.log(error)
+    console.error("Failed to syn user to Stream", error);
   }
+};
 
-}
+const ChatClient = ({ children, user }: { children: React.ReactNode; user: UserResource }) => {
+  const syncedRef = useRef(false);
 
-
-const Chatclient = ({ children, user }: { children: React.ReactNode, user: UserResource }) => {
-  const syncRef = useRef(false)
   useEffect(() => {
-    if (!syncRef.current) {
-      syncRef.current = true
-      SynchUserStream(user)
+    // this if statements is needed so that we don't run this method multiple times. only once!
+    if (!syncedRef.current) {
+      syncedRef.current = true;
+      syncUserToStream(user);
     }
+  }, [user]);
 
-  }, [user])
-
-  const TokenProvider = async () => {
+  const tokenProvider = async () => {
     try {
-      const res = await fetch("/api/token", {
+      const response = await fetch("/api/token", {
         method: "POST",
-        headers: {
-          "Content-type": "application/json"
-        },
-        body: JSON.stringify({
-          userId: user?.id,
-        })
-      })
-      const data = res.json()
-      console.log(data)
-      // @ts-expect-error toke does provided by teh caller
-      return data.token
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id }),
+      });
+      const data = await response.json();
+      return data.token;
     } catch (error) {
       console.log(error)
     }
-  }
+  };
 
-
-  const chatclient = useCreateChatClient({
-    apiKey: STREAM_SECRET_KEY,
-    tokenOrProvider: TokenProvider,
+  const chatClient = useCreateChatClient({
+    apiKey: STREAM_API_KEY,
     userData: {
       id: user.id,
-      name: user.username || user?.fullName || user.emailAddresses[0].emailAddress.split("@")[0],
-      image: user.imageUrl
-    }
-  })
+      name: user.fullName ?? user.username ?? user.emailAddresses[0].emailAddress.split("@")[0],
+      image: user.imageUrl,
+    },
+    tokenOrProvider: tokenProvider,
+  });
 
-  if (!chatclient) {
-    return <FullScreenLoader message="Loading chat..." />
-  }
-
+  if (!chatClient) return <FullScreenLoader message="Loading chat..." />;
 
   return (
     <OverlayProvider value={{ style: studyBuddyTheme }}>
-      <Chat client={chatclient} style={studyBuddyTheme}>
+      <Chat client={chatClient} style={studyBuddyTheme}>
         {children}
       </Chat>
-    </OverlayProvider >
+    </OverlayProvider>
+  );
+};
 
-  )
-}
+const ChatWrapper = ({ children }: { children: React.ReactNode }) => {
+  const { user, isLoaded } = useUser();
 
-export const ChatWrapper = ({ children }: { children: React.ReactNode }) => {
-  const { user, isLoaded } = useUser()
+  if (!isLoaded) return <FullScreenLoader message="Loading chat..." />;
 
-  if (!isLoaded) {
-    return <FullScreenLoader message="Loading chat..." />
-  }
+  // not signed in — render children directly (auth screens)
+  if (!user) return <>{children}</>;
 
-  if (!user) return <> {children} </>
-  return (
-    <Chatclient user={user}> {children} </Chatclient>
-  )
-}
+  return <ChatClient user={user}>{children}</ChatClient>;
+};
+export default ChatWrapper;
+
+// TODO: ADD sentry logs link in the video
+
